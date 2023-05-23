@@ -12,5 +12,14 @@
  * ```
  * */
 export default class Team {
-  // TODO: write your logic here
+  constructor() {
+    this.characters = new Set();
+  }
+
+  add(character) {
+      if (this.characters.has(character)) {
+          throw new Error(`Character ${character} is already in the team`);
+      }
+      this.characters.add(character);
+  }
 }
