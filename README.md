@@ -1,3 +1,5 @@
+![GitHub Actions](https://github.com/Nilumilak//js-advanced-diploma/actions/workflows/ci.yml/badge.svg)
+
 # Дипломное задание к курсу «Продвинутый JavaScript». Retro Game
 
 ###### tags: `netology` `advanced js`
