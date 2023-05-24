@@ -1,7 +1,7 @@
-import Character from './Character';
+import Character from "../Character";
 
 export default class Vampire extends Character {
     constructor(level) {
-        super(level, 25, 25, 'Vampire');
+        super(level, 25, 25, 'vampire');
     }
 }

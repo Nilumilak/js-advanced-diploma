@@ -17,10 +17,10 @@ test('Base Daemon Defence', () => {
 
 test('Base Daemon Health', () => {
     const character = new Daemon(1);
-    expect(character.health).toBe(100);
+    expect(character.health).toBe(50);
 });
 
 test('Base Daemon Health', () => {
     const character = new Daemon(1);
-    expect(character.type).toBe('Daemon');
+    expect(character.type).toBe('daemon');
 });

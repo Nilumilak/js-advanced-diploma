@@ -17,10 +17,10 @@ test('Base Undead Defence', () => {
 
 test('Base Undead Health', () => {
     const character = new Undead(1);
-    expect(character.health).toBe(100);
+    expect(character.health).toBe(50);
 });
 
 test('Base Undead Health', () => {
     const character = new Undead(1);
-    expect(character.type).toBe('Undead');
+    expect(character.type).toBe('undead');
 });

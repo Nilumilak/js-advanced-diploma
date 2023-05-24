@@ -11,12 +11,12 @@ test.each([
     ['bottom-right', 63],
     ['center', 35],
 ])('Test calcTileType: %s', (tileType, index) => {
-    expect(calcTileType(index, testTileMap)).toBe(tileType)
-})
+    expect(calcTileType(index, testTileMap)).toBe(tileType);
+});
 
 test('Test createTileMap', () => {
-    expect(createTileMap(8)).toEqual(testTileMap)
-})
+    expect(createTileMap(8)).toEqual(testTileMap);
+});
 
 const testTileMap = {
     0: 'top-left',
@@ -83,4 +83,4 @@ const testTileMap = {
     61: 'bottom',
     62: 'bottom',
     63: 'bottom-right',
-}
+};

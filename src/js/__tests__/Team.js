@@ -2,7 +2,7 @@ import Team from "../Team";
 import Bowman from "../characters/Bowman";
 
 test('Team add character', () => {
-    expect.assertions(2)
+    expect.assertions(2);
     const team = new Team();
     const character = new Bowman(1);
     team.add(character);

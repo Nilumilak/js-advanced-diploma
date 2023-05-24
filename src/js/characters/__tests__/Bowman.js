@@ -17,10 +17,10 @@ test('Base Bowman Defence', () => {
 
 test('Base Bowman Health', () => {
     const character = new Bowman(1);
-    expect(character.health).toBe(100);
+    expect(character.health).toBe(50);
 });
 
 test('Base Bowman Health', () => {
     const character = new Bowman(1);
-    expect(character.type).toBe('Bowman');
+    expect(character.type).toBe('bowman');
 });

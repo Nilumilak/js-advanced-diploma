@@ -24,37 +24,37 @@
  * */
 export function calcTileType(index, tileMap) {
   // TODO: ваш код будет тут
-  return tileMap[index]
+  return tileMap[index];
 }
 
 export function createTileMap(boardSize) {
-  const tileMap = {}
-  let index = 0
+  const tileMap = {};
+  let index = 0;
   for (let row = 0; row < boardSize; row++) {
     for (let column = 0; column < boardSize; column++) {
       if (row == 0 && column == 0) {
-        tileMap[index] = 'top-left'
+        tileMap[index] = 'top-left';
       } else if (row == 0 && column == boardSize - 1) {
-        tileMap[index] = 'top-right'
+        tileMap[index] = 'top-right';
       } else if (row == boardSize - 1 && column == 0) {
-        tileMap[index] = 'bottom-left'
+        tileMap[index] = 'bottom-left';
       } else if (row == boardSize - 1 && column == boardSize - 1) {
-        tileMap[index] = 'bottom-right'
+        tileMap[index] = 'bottom-right';
       } else if (row == 0) {
-        tileMap[index] = 'top'
+        tileMap[index] = 'top';
       } else if (row == boardSize - 1) {
-        tileMap[index] = 'bottom'
+        tileMap[index] = 'bottom';
       } else if (column == 0) {
-        tileMap[index] = 'left'
+        tileMap[index] = 'left';
       } else if (column == boardSize - 1) {
-        tileMap[index] = 'right'
+        tileMap[index] = 'right';
       } else {
-        tileMap[index] = 'center'
+        tileMap[index] = 'center';
       }
-      index++
+      index++;
     }
   }
-  return tileMap
+  return tileMap;
 }
 
 export function calcHealthLevel(health) {

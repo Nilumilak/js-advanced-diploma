@@ -11,7 +11,7 @@ import Team from "./Team";
  */
 export function* characterGenerator(allowedTypes, maxLevel) {
   while (true) {
-    const RandomCharacter = allowedTypes[Math.ceil(Math.random() * (allowedTypes.length - 1))];
+    const RandomCharacter = allowedTypes[Math.floor(Math.random() * allowedTypes.length)];
     yield new RandomCharacter(Math.ceil(Math.random() * maxLevel));
   }
 }
@@ -29,5 +29,5 @@ export function generateTeam(allowedTypes, maxLevel, characterCount) {
   for (let count = 0; count < characterCount; count++) {
     team.add(generator.next().value);
   }
-  return team
+  return team;
 }

@@ -13,12 +13,15 @@
  * vampire
  */
 export default class Character {
-  constructor(level, type = 'generic') {
+  constructor(level, atttack = 0, defence = 0, type = 'generic') {
     this.level = level;
-    this.attack = 0;
-    this.defence = 0;
+    this.attack = atttack;
+    this.defence = defence;
     this.health = 50;
     this.type = type;
+    if (new.target.name === 'Character') {
+      throw Error('Cannot create class Character');
+    }
     // TODO: выбросите исключение, если кто-то использует "new Character()"
   }
 }

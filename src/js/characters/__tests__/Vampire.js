@@ -17,10 +17,10 @@ test('Base Vampire Defence', () => {
 
 test('Base Vampire Health', () => {
     const character = new Vampire(1);
-    expect(character.health).toBe(100);
+    expect(character.health).toBe(50);
 });
 
 test('Base Vampire Health', () => {
     const character = new Vampire(1);
-    expect(character.type).toBe('Vampire');
+    expect(character.type).toBe('vampire');
 });

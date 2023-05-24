@@ -1,7 +1,7 @@
-import Character from './Character';
+import Character from "../Character";
 
 export default class Swordsman extends Character {
     constructor(level) {
-        super(level, 40, 10, 'Swordsman');
+        super(level, 40, 10, 'swordsman');
     }
 }
