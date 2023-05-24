@@ -10,11 +10,13 @@ import { generateTeam } from "./generators";
 import { getRange, getCharIndexes } from "./utils";
 import GamePlay from "./GamePlay";
 import cursors from "./cursors";
+import GameState from "./GameState";
 
 export default class GameController {
   #selected = undefined;
 
   constructor(gamePlay, stateService) {
+    this.gameState = new GameState();
     this.gamePlay = gamePlay;
     this.stateService = stateService;
     this.allCharacters = {}; // all characters on board
@@ -89,30 +91,36 @@ export default class GameController {
   }
 
   onCellClick(index) {
-    if (!this.cellHasCharacter(index, (character) => {
-      if (getCharIndexes(this.allCharacters.firstTeamPositioned).includes(index)) {
-        for (const posCharacter of this.allCharactersList) {
-          this.gamePlay.deselectCell(posCharacter.position);
-        }
-        this.gamePlay.selectCell(index);
-        this.characterSelected = character;
-      } else if (getCharIndexes(this.allCharacters.secondTeamPositioned).includes(index)) {
-        if (getRange(this.characterSelected, 'maxRange', this.gamePlay.boardSize).includes(index)) {
-          const damage = this.characterSelected.character.attackTarget(character.character);
-          this.gamePlay.redrawPositions(this.allCharactersList);
-          this.gamePlay.showDamage(index, damage);
-        }
-      }
-    })) {
-      if (this.characterSelected) {
-        if (getRange(this.characterSelected, 'maxMoves', this.gamePlay.boardSize).includes(index)) {
-          this.gamePlay.deselectCell(this.characterSelected.position);
-          this.characterSelected.position = index;
+    if (this.gameState.turn == 'first') {
+      if (!this.cellHasCharacter(index, (character) => {
+        if (getCharIndexes(this.allCharacters.firstTeamPositioned).includes(index)) {
+          for (const posCharacter of this.allCharactersList) {
+            this.gamePlay.deselectCell(posCharacter.position);
+          }
           this.gamePlay.selectCell(index);
-          this.gamePlay.redrawPositions(this.allCharactersList);
+          this.characterSelected = character;
+        } else if (getCharIndexes(this.allCharacters.secondTeamPositioned).includes(index)) {
+          if (getRange(this.characterSelected, 'maxRange', this.gamePlay.boardSize).includes(index)) {
+            this.gameState.changeTurn();
+            const damage = this.characterSelected.character.attackTarget(character.character);
+            this.gamePlay.redrawPositions(this.allCharactersList);
+            this.gamePlay.showDamage(index, damage)
+              .then(() => this.enemyTurn());
+          }
         }
-      } else {
-        GamePlay.showError('Empty cell');
+      })) {
+        if (this.characterSelected) {
+          if (getRange(this.characterSelected, 'maxMoves', this.gamePlay.boardSize).includes(index)) {
+            this.gamePlay.deselectCell(this.characterSelected.position);
+            this.characterSelected.position = index;
+            this.gamePlay.selectCell(index);
+            this.gamePlay.redrawPositions(this.allCharactersList);
+            this.gameState.changeTurn();
+            this.enemyTurn();
+          }
+        } else {
+          GamePlay.showError('Empty cell');
+        }
       }
     }
   }
@@ -162,5 +170,29 @@ export default class GameController {
         }
       }
     }
+  }
+
+  enemyTurn() {
+    for (const character of this.allCharacters.secondTeamPositioned) {
+      const characterAttackRange = getRange(character, 'maxRange', this.gamePlay.boardSize);
+      if (this.gameState.turn == 'second') {
+        for (const index of characterAttackRange) {
+          if (this.cellHasCharacter(index, (targetCharacter) => {
+            if (this.allCharacters.firstTeamPositioned.includes(targetCharacter)) {
+              const damage = character.character.attackTarget(targetCharacter.character);
+              this.gamePlay.redrawPositions(this.allCharactersList);
+              this.gamePlay.showDamage(index, damage);
+              this.gameState.changeTurn();
+            }
+          })) {
+            if (this.gameState.turn == 'second') {
+              this.gameState.changeTurn();
+            }
+            return;
+          }
+        }
+      }
+    }
+    this.gameState.changeTurn();
   }
 }
