@@ -12,7 +12,7 @@ export default class GameController {
   constructor(gamePlay, stateService) {
     this.gamePlay = gamePlay;
     this.stateService = stateService;
-    this.teamPositionsList = this.getPositions();
+    this.allCharacters = []; // all characters on board
     this.firstTeamAllowedCharacters = [Bowman, Swordsman, Magician];
     this.secondTeamAllowedCharacters = [Daemon, Undead, Vampire];
   }
@@ -23,9 +23,12 @@ export default class GameController {
 
     const firstTeam = generateTeam(this.firstTeamAllowedCharacters, 4, 2);
     const secondTeam = generateTeam(this.secondTeamAllowedCharacters, 4, 2);
-    const firsTeamPositioned = this.initPositionTeam(firstTeam, this.teamPositionsList.firstTeamPositionsList);
-    const secondTeamPositioned = this.initPositionTeam(secondTeam, this.teamPositionsList.secondTeamPositionsList);
-    this.gamePlay.redrawPositions(firsTeamPositioned.concat(secondTeamPositioned));
+    const teamPositionsList = this.getPositions();
+    const firsTeamPositioned = this.initPositionTeam(firstTeam, teamPositionsList.firstTeamPositionsList);
+    const secondTeamPositioned = this.initPositionTeam(secondTeam, teamPositionsList.secondTeamPositionsList);
+    this.allCharacters = firsTeamPositioned.concat(secondTeamPositioned);
+    this.gamePlay.redrawPositions(this.allCharacters);
+    this.setHandlers();
     // TODO: load saved stated from stateService
   }
 
@@ -37,6 +40,11 @@ export default class GameController {
       positionedCharacterList.push(new PositionedCharacter(character, position));
     }
     return positionedCharacterList;
+  }
+
+  setHandlers() {
+    this.gamePlay.addCellEnterListener(this.onCellEnter.bind(this));
+    this.gamePlay.addCellLeaveListener(this.onCellLeave.bind(this));
   }
 
   getPositions() {
@@ -61,11 +69,21 @@ export default class GameController {
     // TODO: react to click
   }
 
+  characterTag(character) {
+    return `🎖${character.level} ⚔${character.attack} 🛡${character.defence} ❤${character.health}`;
+  }
+
   onCellEnter(index) {
     // TODO: react to mouse enter
+    for (const posCharacter of this.allCharacters) {
+      if (posCharacter.position == index) {
+        this.gamePlay.showCellTooltip(this.characterTag(posCharacter.character), index);
+      }
+    }
   }
 
   onCellLeave(index) {
     // TODO: react to mouse leave
+    this.gamePlay.hideCellTooltip(index);
   }
 }
