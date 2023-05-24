@@ -7,6 +7,7 @@ import Swordsman from "./characters/Swordsman";
 import Undead from "./characters/Undead";
 import Vampire from "./characters/Vampire";
 import { generateTeam } from "./generators";
+import GamePlay from "./GamePlay";
 
 export default class GameController {
   constructor(gamePlay, stateService) {
@@ -45,6 +46,7 @@ export default class GameController {
   setHandlers() {
     this.gamePlay.addCellEnterListener(this.onCellEnter.bind(this));
     this.gamePlay.addCellLeaveListener(this.onCellLeave.bind(this));
+    this.gamePlay.addCellClickListener(this.onCellClick.bind(this));
   }
 
   getPositions() {
@@ -66,20 +68,34 @@ export default class GameController {
   }
 
   onCellClick(index) {
-    // TODO: react to click
+    if (!this.cellHasCharacter(index, () => {
+      for (const posCharacter of this.allCharacters) {
+        this.gamePlay.deselectCell(posCharacter.position);
+      }
+      this.gamePlay.selectCell(index);
+    })) {
+      GamePlay.showError('Empty cell');
+    }
   }
 
   characterTag(character) {
     return `🎖${character.level} ⚔${character.attack} 🛡${character.defence} ❤${character.health}`;
   }
 
-  onCellEnter(index) {
-    // TODO: react to mouse enter
+  cellHasCharacter(index, callback) {
     for (const posCharacter of this.allCharacters) {
       if (posCharacter.position == index) {
-        this.gamePlay.showCellTooltip(this.characterTag(posCharacter.character), index);
+        callback(posCharacter);
+        return true;
       }
     }
+    return false;
+  }
+
+  onCellEnter(index) {
+    this.cellHasCharacter(index, (posCharacter) => {
+      this.gamePlay.showCellTooltip(this.characterTag(posCharacter.character), index);
+    });
   }
 
   onCellLeave(index) {
