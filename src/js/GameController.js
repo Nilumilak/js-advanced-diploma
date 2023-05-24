@@ -103,6 +103,7 @@ export default class GameController {
           if (getRange(this.characterSelected, 'maxRange', this.gamePlay.boardSize).includes(index)) {
             this.gameState.changeTurn();
             const damage = this.characterSelected.character.attackTarget(character.character);
+            this.deleteDeadCharacters();
             this.gamePlay.redrawPositions(this.allCharactersList);
             this.gamePlay.showDamage(index, damage)
               .then(() => this.enemyTurn());
@@ -129,8 +130,8 @@ export default class GameController {
     return `🎖${character.level} ⚔${character.attack} 🛡${character.defence} ❤${character.health}`;
   }
 
-  cellHasCharacter(index, callback) {
-    for (const posCharacter of this.allCharactersList) {
+  cellHasCharacter(index, callback, characterList = this.allCharactersList) {
+    for (const posCharacter of characterList) {
       if (posCharacter.position == index) {
         callback(posCharacter);
         return true;
@@ -180,11 +181,12 @@ export default class GameController {
           if (this.cellHasCharacter(index, (targetCharacter) => {
             if (this.allCharacters.firstTeamPositioned.includes(targetCharacter)) {
               const damage = character.character.attackTarget(targetCharacter.character);
+              this.deleteDeadCharacters();
               this.gamePlay.redrawPositions(this.allCharactersList);
               this.gamePlay.showDamage(index, damage);
               this.gameState.changeTurn();
             }
-          })) {
+          }, this.allCharacters.firstTeamPositioned)) {
             if (this.gameState.turn == 'second') {
               this.gameState.changeTurn();
             }
@@ -194,5 +196,25 @@ export default class GameController {
       }
     }
     this.gameState.changeTurn();
+  }
+
+  deleteDeadCharacters() {
+    for (const character of this.allCharactersList) {
+      if (character.character.health <= 0) {
+        let index = this.allCharacters.firstTeamPositioned.indexOf(character);
+        if (index > -1) {
+          this.allCharacters.firstTeamPositioned.splice(this.allCharacters.firstTeamPositioned.indexOf(character), 1);
+          if (character == this.characterSelected) {
+            this.gamePlay.deselectCell(this.characterSelected.position);
+            this.characterSelected = undefined;
+          }
+        } else {
+          index = this.allCharacters.secondTeamPositioned.indexOf(character);
+          if (index > -1) {
+            this.allCharacters.secondTeamPositioned.splice(this.allCharacters.secondTeamPositioned.indexOf(character), 1);
+          }
+        }
+      }
+    }
   }
 }
