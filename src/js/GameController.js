@@ -15,6 +15,10 @@ import GameState from "./GameState";
 export default class GameController {
   #selected = undefined;
 
+  #levelTypes = [themes.mountain, themes.arctic, themes.desert];
+
+  #enemiesAmount = [5, 4, 3];
+
   constructor(gamePlay, stateService) {
     this.gameState = new GameState();
     this.gamePlay = gamePlay;
@@ -22,6 +26,14 @@ export default class GameController {
     this.allCharacters = {}; // all characters on board
     this.firstTeamAllowedCharacters = [Bowman, Swordsman, Magician];
     this.secondTeamAllowedCharacters = [Daemon, Undead, Vampire];
+  }
+
+  get getNextLevelType() {
+    return this.#levelTypes.pop();
+  }
+
+  get getNextEnemiesAmount() {
+    return this.#enemiesAmount.pop();
   }
 
   get allCharactersList() {
@@ -100,7 +112,7 @@ export default class GameController {
           this.gamePlay.selectCell(index);
           this.characterSelected = character;
         } else if (getCharIndexes(this.allCharacters.secondTeamPositioned).includes(index)) {
-          if (getRange(this.characterSelected, 'maxRange', this.gamePlay.boardSize).includes(index)) {
+          if (this.characterSelected && getRange(this.characterSelected, 'maxRange', this.gamePlay.boardSize).includes(index)) {
             this.gameState.changeTurn();
             const damage = this.characterSelected.character.attackTarget(character.character);
             this.deleteDeadCharacters();
@@ -215,6 +227,33 @@ export default class GameController {
           }
         }
       }
+    }
+    if (!this.allCharacters.secondTeamPositioned.length) {
+      this.levelUpCharacters(this.allCharacters.firstTeamPositioned);
+      this.startNextLevel();
+    }
+  }
+
+  startNextLevel() {
+    this.characterSelected = undefined;
+    this.gamePlay.drawUi(this.getNextLevelType);
+
+    const firstTeam = generateTeam(this.firstTeamAllowedCharacters, 4, 1);
+    this.allCharacters.firstTeamPositioned.forEach(item => firstTeam.characters.add(item.character));
+    const secondTeam = generateTeam(this.secondTeamAllowedCharacters, 4, this.getNextEnemiesAmount);
+    const teamPositionsList = this.getPositions();
+    const firstTeamPositioned = this.initPositionTeam(firstTeam, teamPositionsList.firstTeamPositionsList);
+    const secondTeamPositioned = this.initPositionTeam(secondTeam, teamPositionsList.secondTeamPositionsList);
+    this.allCharacters.firstTeamPositioned = firstTeamPositioned;
+    this.allCharacters.secondTeamPositioned = secondTeamPositioned;
+    this.gamePlay.redrawPositions(this.allCharactersList);
+  }
+
+  levelUpCharacters(characterList) {
+    for (const posCharacter of characterList) {
+      posCharacter.character.attack = Math.max(posCharacter.character.attack, posCharacter.character.attack * ((80 + posCharacter.character.health) / 100));
+      posCharacter.character.defence = Math.max(posCharacter.character.defence, posCharacter.character.defence * ((80 + posCharacter.character.health) / 100));
+      posCharacter.character.health = Math.min(100, posCharacter.character.health + 80);
     }
   }
 }
