@@ -45,9 +45,9 @@ export default class GameController {
     const firstTeam = generateTeam(this.firstTeamAllowedCharacters, 4, 2);
     const secondTeam = generateTeam(this.secondTeamAllowedCharacters, 4, 2);
     const teamPositionsList = this.getPositions();
-    const firsTeamPositioned = this.initPositionTeam(firstTeam, teamPositionsList.firstTeamPositionsList);
+    const firstTeamPositioned = this.initPositionTeam(firstTeam, teamPositionsList.firstTeamPositionsList);
     const secondTeamPositioned = this.initPositionTeam(secondTeam, teamPositionsList.secondTeamPositionsList);
-    this.allCharacters.firsTeamPositioned = firsTeamPositioned;
+    this.allCharacters.firstTeamPositioned = firstTeamPositioned;
     this.allCharacters.secondTeamPositioned = secondTeamPositioned;
     this.gamePlay.redrawPositions(this.allCharactersList);
     this.setHandlers();
@@ -90,12 +90,18 @@ export default class GameController {
 
   onCellClick(index) {
     if (!this.cellHasCharacter(index, (character) => {
-      if (getCharIndexes(this.allCharacters.firsTeamPositioned).includes(index)) {
+      if (getCharIndexes(this.allCharacters.firstTeamPositioned).includes(index)) {
         for (const posCharacter of this.allCharactersList) {
           this.gamePlay.deselectCell(posCharacter.position);
         }
         this.gamePlay.selectCell(index);
         this.characterSelected = character;
+      } else if (getCharIndexes(this.allCharacters.secondTeamPositioned).includes(index)) {
+        if (getRange(this.characterSelected, 'maxRange', this.gamePlay.boardSize).includes(index)) {
+          const damage = this.characterSelected.character.attackTarget(character.character);
+          this.gamePlay.redrawPositions(this.allCharactersList);
+          this.gamePlay.showDamage(index, damage);
+        }
       }
     })) {
       if (this.characterSelected) {
@@ -128,7 +134,7 @@ export default class GameController {
   onCellEnter(index) {
     this.cellHasCharacter(index, (posCharacter) => {
       this.gamePlay.showCellTooltip(this.characterTag(posCharacter.character), index);
-      if (this.allCharacters.firsTeamPositioned.includes(posCharacter)) {
+      if (this.allCharacters.firstTeamPositioned.includes(posCharacter)) {
         this.gamePlay.setCursor(cursors.pointer);
       } else if (this.characterSelected && this.allCharacters.secondTeamPositioned.includes(posCharacter)) {
         if (getRange(this.characterSelected, 'maxRange', this.gamePlay.boardSize).includes(posCharacter.position)) {

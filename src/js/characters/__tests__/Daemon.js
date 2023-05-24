@@ -34,3 +34,10 @@ test('Base Daemon Range', () => {
     const character = new Daemon(1);
     expect(character.maxRange).toBe(4);
 });
+
+test('Attack', () => {
+    const character1 = new Daemon(1);
+    const character2 = new Daemon(1);
+    character1.attackTarget(character2);
+    expect(character2.health).toBe(49);
+});

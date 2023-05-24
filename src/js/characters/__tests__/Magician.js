@@ -34,3 +34,10 @@ test('Base Magician Range', () => {
     const character = new Magician(1);
     expect(character.maxRange).toBe(4);
 });
+
+test('Attack', () => {
+    const character1 = new Magician(1);
+    const character2 = new Magician(1);
+    character1.attackTarget(character2);
+    expect(character2.health).toBe(49);
+});

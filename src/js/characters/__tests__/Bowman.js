@@ -34,3 +34,10 @@ test('Base Bowman Range', () => {
     const character = new Bowman(1);
     expect(character.maxRange).toBe(2);
 });
+
+test('Attack', () => {
+    const character1 = new Bowman(1);
+    const character2 = new Bowman(1);
+    character1.attackTarget(character2);
+    expect(character2.health).toBe(47.5);
+});

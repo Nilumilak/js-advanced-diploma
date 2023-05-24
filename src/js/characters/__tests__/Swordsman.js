@@ -34,3 +34,10 @@ test('Base Swordsman Range', () => {
     const character = new Swordsman(1);
     expect(character.maxRange).toBe(1);
 });
+
+test('Attack', () => {
+    const character1 = new Swordsman(1);
+    const character2 = new Swordsman(1);
+    character1.attackTarget(character2);
+    expect(character2.health).toBe(20);
+});

@@ -24,4 +24,10 @@ export default class Character {
     }
     // TODO: выбросите исключение, если кто-то использует "new Character()"
   }
+
+  attackTarget(target) {
+    const damage = Math.max(this.attack - target.defence, this.attack * 0.1);
+    target.health -= damage;
+    return damage;
+  }
 }
