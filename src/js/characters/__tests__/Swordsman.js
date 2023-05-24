@@ -24,3 +24,13 @@ test('Base Swordsman Health', () => {
     const character = new Swordsman(1);
     expect(character.type).toBe('swordsman');
 });
+
+test('Base Swordsman Moves', () => {
+    const character = new Swordsman(1);
+    expect(character.maxMoves).toBe(4);
+});
+
+test('Base Swordsman Range', () => {
+    const character = new Swordsman(1);
+    expect(character.maxRange).toBe(1);
+});

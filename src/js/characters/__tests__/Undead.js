@@ -24,3 +24,13 @@ test('Base Undead Health', () => {
     const character = new Undead(1);
     expect(character.type).toBe('undead');
 });
+
+test('Base Undead Moves', () => {
+    const character = new Undead(1);
+    expect(character.maxMoves).toBe(4);
+});
+
+test('Base Undead Range', () => {
+    const character = new Undead(1);
+    expect(character.maxRange).toBe(1);
+});

@@ -68,3 +68,48 @@ export function calcHealthLevel(health) {
 
   return 'high';
 }
+
+export function getRange(posCharacter, type, boardSize) {
+  let position = 0;
+  for (let row = 0; row < boardSize; row++) {
+    for (let column = 0; column < boardSize; column++) {
+      if (position == posCharacter.position) {
+        const range = posCharacter.character[type];
+        return getRangeList(posCharacter, column, boardSize, range);
+      }
+      position++;
+    }
+  }
+}
+
+export function getCharIndexes(charList) {
+  const indexList = [];
+  for (const posCharacter of charList) {
+    indexList.push(posCharacter.position);
+  }
+  return indexList;
+}
+
+function getRangeList(posCharacter, charColumn, boardSize, range) {
+  const rangeList = [];
+
+  let leftIndex = posCharacter.position - (range * (boardSize + 1));
+  let columnEnd = range * 2;
+
+  if (charColumn < range) {
+    leftIndex += range - charColumn;
+    columnEnd -= range - charColumn;
+  } else if (boardSize - charColumn - 1 < range) {
+    columnEnd -= range - (boardSize - charColumn - 1);
+  }
+
+  for (let rangeRow = 0; rangeRow <= range * 2; rangeRow++) {
+    for (let rangeIndex = leftIndex; rangeIndex <= leftIndex + columnEnd; rangeIndex++) {
+      if (rangeIndex != posCharacter.position) {
+        rangeList.push(rangeIndex);
+      }
+    }
+    leftIndex += boardSize;
+  }
+  return rangeList;
+}

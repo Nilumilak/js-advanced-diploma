@@ -24,3 +24,13 @@ test('Base Bowman Health', () => {
     const character = new Bowman(1);
     expect(character.type).toBe('bowman');
 });
+
+test('Base Bowman Moves', () => {
+    const character = new Bowman(1);
+    expect(character.maxMoves).toBe(2);
+});
+
+test('Base Bowman Range', () => {
+    const character = new Bowman(1);
+    expect(character.maxRange).toBe(2);
+});

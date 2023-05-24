@@ -24,3 +24,13 @@ test('Base Daemon Health', () => {
     const character = new Daemon(1);
     expect(character.type).toBe('daemon');
 });
+
+test('Base Daemon Moves', () => {
+    const character = new Daemon(1);
+    expect(character.maxMoves).toBe(1);
+});
+
+test('Base Daemon Range', () => {
+    const character = new Daemon(1);
+    expect(character.maxRange).toBe(4);
+});

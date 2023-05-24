@@ -1,22 +1,12 @@
-import { calcTileType, createTileMap } from "../utils";
-
-test.each([
-    ['top-left', 0],
-    ['top', 5],
-    ['top-right', 7],
-    ['left', 8],
-    ['right', 15],
-    ['bottom-left', 56],
-    ['bottom', 60],
-    ['bottom-right', 63],
-    ['center', 35],
-])('Test calcTileType: %s', (tileType, index) => {
-    expect(calcTileType(index, testTileMap)).toBe(tileType);
-});
-
-test('Test createTileMap', () => {
-    expect(createTileMap(8)).toEqual(testTileMap);
-});
+import {
+    calcTileType, 
+    createTileMap, 
+    getRange, 
+    getCharIndexes,
+} from "../utils";
+import PositionedCharacter from "../PositionedCharacter";
+import Magician from "../characters/Magician";
+import Undead from "../characters/Undead";
 
 const testTileMap = {
     0: 'top-left',
@@ -84,3 +74,41 @@ const testTileMap = {
     62: 'bottom',
     63: 'bottom-right',
 };
+
+test.each([
+    ['top-left', 0],
+    ['top', 5],
+    ['top-right', 7],
+    ['left', 8],
+    ['right', 15],
+    ['bottom-left', 56],
+    ['bottom', 60],
+    ['bottom-right', 63],
+    ['center', 35],
+])('Test calcTileType: %s', (tileType, index) => {
+    expect(calcTileType(index, testTileMap)).toBe(tileType);
+});
+
+test('Test createTileMap', () => {
+    expect(createTileMap(8)).toEqual(testTileMap);
+});
+
+test('getRange moves', () => {
+    const character = new Magician(1);
+    const posCharacter = new PositionedCharacter(character, 12);
+    expect(getRange(posCharacter, 'maxMoves', 5)).toEqual([6, 7, 8, 11, 13, 16, 17, 18]);
+});
+
+test('getRange attack range', () => {
+    const character = new Undead(1);
+    const posCharacter = new PositionedCharacter(character, 12);
+    expect(getRange(posCharacter, 'maxRange', 5)).toEqual([6, 7, 8, 11, 13, 16, 17, 18]);
+});
+
+test('getCharIndexed', () => {
+    const character = new Undead(1);
+    const posCharacter1 = new PositionedCharacter(character, 12);
+    const posCharacter2 = new PositionedCharacter(character, 13);
+    const posCharacter3 = new PositionedCharacter(character, 14);
+    expect(getCharIndexes([posCharacter1, posCharacter2, posCharacter3])).toEqual([12, 13, 14]);
+});

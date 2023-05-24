@@ -24,3 +24,13 @@ test('Base Vampire Health', () => {
     const character = new Vampire(1);
     expect(character.type).toBe('vampire');
 });
+
+test('Base Vampire Moves', () => {
+    const character = new Vampire(1);
+    expect(character.maxMoves).toBe(2);
+});
+
+test('Base Vampire Range', () => {
+    const character = new Vampire(1);
+    expect(character.maxRange).toBe(2);
+});

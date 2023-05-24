@@ -24,3 +24,13 @@ test('Base Magician Health', () => {
     const character = new Magician(1);
     expect(character.type).toBe('magician');
 });
+
+test('Base Magician Moves', () => {
+    const character = new Magician(1);
+    expect(character.maxMoves).toBe(1);
+});
+
+test('Base Magician Range', () => {
+    const character = new Magician(1);
+    expect(character.maxRange).toBe(4);
+});
