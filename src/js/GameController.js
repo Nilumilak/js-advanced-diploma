@@ -98,7 +98,16 @@ export default class GameController {
         this.characterSelected = character;
       }
     })) {
-      GamePlay.showError('Empty cell');
+      if (this.characterSelected) {
+        if (getRange(this.characterSelected, 'maxMoves', this.gamePlay.boardSize).includes(index)) {
+          this.gamePlay.deselectCell(this.characterSelected.position);
+          this.characterSelected.position = index;
+          this.gamePlay.selectCell(index);
+          this.gamePlay.redrawPositions(this.allCharactersList);
+        }
+      } else {
+        GamePlay.showError('Empty cell');
+      }
     }
   }
 
@@ -138,7 +147,6 @@ export default class GameController {
   }
 
   onCellLeave(index) {
-    // TODO: react to mouse leave
     this.gamePlay.hideCellTooltip(index);
     this.gamePlay.setCursor(cursors.auto);
     for (let row = 0; row < this.gamePlay.boardSize; row++) {
