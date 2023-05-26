@@ -41,3 +41,13 @@ test('Attack', () => {
     character1.attackTarget(character2);
     expect(character2.health).toBe(47.5);
 });
+
+test('levelUp', () => {
+    expect.assertions(4);
+    const character = new Bowman(1);
+    character.levelUp();
+    expect(character.level).toBe(2);
+    expect(character.attack).toBe(32.5);
+    expect(character.defence).toBe(32.5);
+    expect(character.health).toBe(100);
+});

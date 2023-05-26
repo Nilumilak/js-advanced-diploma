@@ -261,7 +261,7 @@ export default class GameController {
       this.finishGame();
     }
     if (!this.allCharacters.secondTeamPositioned.length) {
-      this.levelUpCharacters(this.allCharacters.firstTeamPositioned);
+      this.allCharacters.firstTeamPositioned.forEach((character) => character.character.levelUp());
       this.startNextLevel();
     }
   }
@@ -283,14 +283,6 @@ export default class GameController {
       this.allCharacters.firstTeamPositioned = firstTeamPositioned;
       this.allCharacters.secondTeamPositioned = secondTeamPositioned;
       this.gamePlay.redrawPositions(this.allCharactersList);
-    }
-  }
-
-  levelUpCharacters(characterList) {
-    for (const posCharacter of characterList) {
-      posCharacter.character.attack = Math.max(posCharacter.character.attack, posCharacter.character.attack * ((80 + posCharacter.character.health) / 100));
-      posCharacter.character.defence = Math.max(posCharacter.character.defence, posCharacter.character.defence * ((80 + posCharacter.character.health) / 100));
-      posCharacter.character.health = Math.min(100, posCharacter.character.health + 80);
     }
   }
 
@@ -343,7 +335,7 @@ export default class GameController {
       this.#currentLevel = nextLevel;
       this.setlevelTypes(this.gameState.nextLevelsList);
       this.gamePlay.drawUi(nextLevel);
-  
+      
       this.allCharacters.firstTeamPositioned = this.gameState.firstTeamList.map(data => this.createCharacterFromData(data));
       this.allCharacters.secondTeamPositioned = this.gameState.secondTeamList.map(data => this.createCharacterFromData(data));
       this.gamePlay.redrawPositions(this.allCharactersList);
@@ -354,7 +346,7 @@ export default class GameController {
 
   createCharacterFromData(data) {
     if (Object.keys(this.#characterTypes).includes(data.character.type)) {
-      const character = new this.#characterTypes[data.character.type](data.character.level, data.character.attack, data.character.defence, data.character.health);
+      const character = new this.#characterTypes[data.character.type](data.character.level, data.character.attack, data.character.defence, data.character.health, true);
       return new PositionedCharacter(character, data.position);
     }
   }
