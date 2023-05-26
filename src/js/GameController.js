@@ -13,9 +13,20 @@ import cursors from "./cursors";
 import GameState from "./GameState";
 
 export default class GameController {
+  #characterTypes = {
+    bowman: Bowman,
+    daemon: Daemon,
+    magician: Magician,
+    swordsman: Swordsman,
+    undead: Undead,
+    vampire: Vampire,
+  };
+
   #selected = undefined;
 
   #levelTypes = [themes.mountain, themes.arctic, themes.desert];
+
+  #currentLevel = undefined;
 
   #enemiesAmount = [5, 4, 3];
 
@@ -27,9 +38,22 @@ export default class GameController {
     this.firstTeamAllowedCharacters = [Bowman, Swordsman, Magician];
     this.secondTeamAllowedCharacters = [Daemon, Undead, Vampire];
   }
+  
+  get currentLevel() {
+    return this.#currentLevel;
+  }
 
   get getNextLevelType() {
-    return this.#levelTypes.pop();
+    this.#currentLevel = this.#levelTypes.pop();
+    return this.#currentLevel;
+  }
+
+  get nextLevelsList() {
+    return this.#levelTypes;
+  }
+
+  setlevelTypes(levelTypesList) {
+    this.#levelTypes = levelTypesList;
   }
 
   refreshLevels() {
@@ -62,16 +86,7 @@ export default class GameController {
 
   init() {
     // TODO: add event listeners to gamePlay events
-    this.gamePlay.drawUi(themes.prairie);
-
-    const firstTeam = generateTeam(this.firstTeamAllowedCharacters, 4, 2);
-    const secondTeam = generateTeam(this.secondTeamAllowedCharacters, 4, 2);
-    const teamPositionsList = this.getPositions();
-    const firstTeamPositioned = this.initPositionTeam(firstTeam, teamPositionsList.firstTeamPositionsList);
-    const secondTeamPositioned = this.initPositionTeam(secondTeam, teamPositionsList.secondTeamPositionsList);
-    this.allCharacters.firstTeamPositioned = firstTeamPositioned;
-    this.allCharacters.secondTeamPositioned = secondTeamPositioned;
-    this.gamePlay.redrawPositions(this.allCharactersList);
+    this.startNewGame();
     this.setHandlers();
     // TODO: load saved stated from stateService
   }
@@ -91,6 +106,8 @@ export default class GameController {
     this.gamePlay.addCellLeaveListener(this.onCellLeave.bind(this));
     this.gamePlay.addCellClickListener(this.onCellClick.bind(this));
     this.gamePlay.addNewGameListener(this.startNewGame.bind(this));
+    this.gamePlay.addSaveGameListener(this.saveGame.bind(this));
+    this.gamePlay.addLoadGameListener(this.loadGame.bind(this));
   }
 
   getPositions() {
@@ -290,9 +307,55 @@ export default class GameController {
   }
 
   startNewGame() {
+    this.gameState.running = true;
     this.refreshLevels();
     this.refreshEnemies();
     this.gameState.refreshPoints();
-    this.init();
+    
+    this.gamePlay.drawUi(themes.prairie);
+    this.#currentLevel = themes.prairie;
+
+    const firstTeam = generateTeam(this.firstTeamAllowedCharacters, 4, 2);
+    const secondTeam = generateTeam(this.secondTeamAllowedCharacters, 4, 2);
+    const teamPositionsList = this.getPositions();
+    const firstTeamPositioned = this.initPositionTeam(firstTeam, teamPositionsList.firstTeamPositionsList);
+    const secondTeamPositioned = this.initPositionTeam(secondTeam, teamPositionsList.secondTeamPositionsList);
+    this.allCharacters.firstTeamPositioned = firstTeamPositioned;
+    this.allCharacters.secondTeamPositioned = secondTeamPositioned;
+    this.gamePlay.redrawPositions(this.allCharactersList);
+  }
+
+  saveGame() {
+    this.gameState.firstTeamList = this.allCharacters.firstTeamPositioned;
+    this.gameState.secondTeamList = this.allCharacters.secondTeamPositioned;
+    this.gameState.currentLevel = this.currentLevel;
+    this.gameState.nextLevelsList = this.nextLevelsList;
+    this.stateService.save(this.gameState);
+  }
+
+  loadGame() {
+    try {
+      const savedData = this.stateService.load();
+      this.gameState = GameState.from(savedData);
+  
+      this.characterSelected = undefined;
+      const nextLevel = this.gameState.currentLevel;
+      this.#currentLevel = nextLevel;
+      this.setlevelTypes(this.gameState.nextLevelsList);
+      this.gamePlay.drawUi(nextLevel);
+  
+      this.allCharacters.firstTeamPositioned = this.gameState.firstTeamList.map(data => this.createCharacterFromData(data));
+      this.allCharacters.secondTeamPositioned = this.gameState.secondTeamList.map(data => this.createCharacterFromData(data));
+      this.gamePlay.redrawPositions(this.allCharactersList);
+    } catch {
+      GamePlay.showError('Cannot find saved data');
+    }
+  }
+
+  createCharacterFromData(data) {
+    if (Object.keys(this.#characterTypes).includes(data.character.type)) {
+      const character = new this.#characterTypes[data.character.type](data.character.level, data.character.attack, data.character.defence, data.character.health);
+      return new PositionedCharacter(character, data.position);
+    }
   }
 }

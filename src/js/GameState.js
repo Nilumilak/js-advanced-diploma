@@ -4,11 +4,15 @@ export default class GameState {
     second: 'second',
   };
 
-  constructor() {
-    this.turn = this.#turn.first;
-    this.running = true;
-    this.points = 0;
-    this.maxPoints = 0;
+  constructor(turn = this.#turn.first, running = true, points = 0, maxPoints = 0, firstTeamList = [], secondTeamList = [], currentLevel = undefined, nextLevelsList = []) {
+    this.turn = turn;
+    this.running = running;
+    this.points = points;
+    this.maxPoints = maxPoints;
+    this.firstTeamList = firstTeamList;
+    this.secondTeamList = secondTeamList;
+    this.currentLevel = currentLevel;
+    this.nextLevelsList = nextLevelsList;
   }
 
   changeTurn() {
@@ -33,7 +37,25 @@ export default class GameState {
   }
   
   static from(object) {
-    // TODO: create object
-    return null;
+    const {
+      turn,
+      running,
+      points,
+      maxPoints,
+      firstTeamList,
+      secondTeamList,
+      currentLevel,
+      nextLevelsList,
+    } = object;
+    return new GameState(
+      turn,
+      running,
+      points,
+      maxPoints,
+      firstTeamList,
+      secondTeamList,
+      currentLevel,
+      nextLevelsList,
+      );
   }
 }
