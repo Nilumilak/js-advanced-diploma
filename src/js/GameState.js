@@ -6,6 +6,9 @@ export default class GameState {
 
   constructor() {
     this.turn = this.#turn.first;
+    this.running = true;
+    this.points = 0;
+    this.maxPoints = 0;
   }
 
   changeTurn() {
@@ -14,6 +17,19 @@ export default class GameState {
     } else {
       this.turn = this.#turn.first;
     }
+  }
+
+  getPoint() {
+    this.points++;
+  }
+
+  refreshPoints() {
+    this.points = 0;
+  }
+
+  saveMaxPoints() {
+    this.maxPoints = this.points;
+    this.points = 0;
   }
   
   static from(object) {

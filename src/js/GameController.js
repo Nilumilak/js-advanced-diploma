@@ -32,8 +32,16 @@ export default class GameController {
     return this.#levelTypes.pop();
   }
 
+  refreshLevels() {
+    this.#levelTypes = [themes.mountain, themes.arctic, themes.desert];
+  }
+
   get getNextEnemiesAmount() {
     return this.#enemiesAmount.pop();
+  }
+
+  refreshEnemies() {
+    this.#enemiesAmount = [5, 4, 3];
   }
 
   get allCharactersList() {
@@ -82,6 +90,7 @@ export default class GameController {
     this.gamePlay.addCellEnterListener(this.onCellEnter.bind(this));
     this.gamePlay.addCellLeaveListener(this.onCellLeave.bind(this));
     this.gamePlay.addCellClickListener(this.onCellClick.bind(this));
+    this.gamePlay.addNewGameListener(this.startNewGame.bind(this));
   }
 
   getPositions() {
@@ -103,36 +112,38 @@ export default class GameController {
   }
 
   onCellClick(index) {
-    if (this.gameState.turn == 'first') {
-      if (!this.cellHasCharacter(index, (character) => {
-        if (getCharIndexes(this.allCharacters.firstTeamPositioned).includes(index)) {
-          for (const posCharacter of this.allCharactersList) {
-            this.gamePlay.deselectCell(posCharacter.position);
-          }
-          this.gamePlay.selectCell(index);
-          this.characterSelected = character;
-        } else if (getCharIndexes(this.allCharacters.secondTeamPositioned).includes(index)) {
-          if (this.characterSelected && getRange(this.characterSelected, 'maxRange', this.gamePlay.boardSize).includes(index)) {
-            this.gameState.changeTurn();
-            const damage = this.characterSelected.character.attackTarget(character.character);
-            this.deleteDeadCharacters();
-            this.gamePlay.redrawPositions(this.allCharactersList);
-            this.gamePlay.showDamage(index, damage)
-              .then(() => this.enemyTurn());
-          }
-        }
-      })) {
-        if (this.characterSelected) {
-          if (getRange(this.characterSelected, 'maxMoves', this.gamePlay.boardSize).includes(index)) {
-            this.gamePlay.deselectCell(this.characterSelected.position);
-            this.characterSelected.position = index;
+    if (this.gameState.running) {
+      if (this.gameState.turn == 'first') {
+        if (!this.cellHasCharacter(index, (character) => {
+          if (getCharIndexes(this.allCharacters.firstTeamPositioned).includes(index)) {
+            for (const posCharacter of this.allCharactersList) {
+              this.gamePlay.deselectCell(posCharacter.position);
+            }
             this.gamePlay.selectCell(index);
-            this.gamePlay.redrawPositions(this.allCharactersList);
-            this.gameState.changeTurn();
-            this.enemyTurn();
+            this.characterSelected = character;
+          } else if (getCharIndexes(this.allCharacters.secondTeamPositioned).includes(index)) {
+            if (this.characterSelected && getRange(this.characterSelected, 'maxRange', this.gamePlay.boardSize).includes(index)) {
+              this.gameState.changeTurn();
+              const damage = this.characterSelected.character.attackTarget(character.character);
+              this.deleteDeadCharacters();
+              this.gamePlay.redrawPositions(this.allCharactersList);
+              this.gamePlay.showDamage(index, damage)
+                .then(() => this.enemyTurn());
+            }
           }
-        } else {
-          GamePlay.showError('Empty cell');
+        })) {
+          if (this.characterSelected) {
+            if (getRange(this.characterSelected, 'maxMoves', this.gamePlay.boardSize).includes(index)) {
+              this.gamePlay.deselectCell(this.characterSelected.position);
+              this.characterSelected.position = index;
+              this.gamePlay.selectCell(index);
+              this.gamePlay.redrawPositions(this.allCharactersList);
+              this.gameState.changeTurn();
+              this.enemyTurn();
+            }
+          } else {
+            GamePlay.showError('Empty cell');
+          }
         }
       }
     }
@@ -224,9 +235,13 @@ export default class GameController {
           index = this.allCharacters.secondTeamPositioned.indexOf(character);
           if (index > -1) {
             this.allCharacters.secondTeamPositioned.splice(this.allCharacters.secondTeamPositioned.indexOf(character), 1);
+            this.gameState.getPoint();
           }
         }
       }
+    }
+    if (!this.allCharacters.firstTeamPositioned.length) {
+      this.finishGame();
     }
     if (!this.allCharacters.secondTeamPositioned.length) {
       this.levelUpCharacters(this.allCharacters.firstTeamPositioned);
@@ -236,17 +251,22 @@ export default class GameController {
 
   startNextLevel() {
     this.characterSelected = undefined;
-    this.gamePlay.drawUi(this.getNextLevelType);
-
-    const firstTeam = generateTeam(this.firstTeamAllowedCharacters, 4, 1);
-    this.allCharacters.firstTeamPositioned.forEach(item => firstTeam.characters.add(item.character));
-    const secondTeam = generateTeam(this.secondTeamAllowedCharacters, 4, this.getNextEnemiesAmount);
-    const teamPositionsList = this.getPositions();
-    const firstTeamPositioned = this.initPositionTeam(firstTeam, teamPositionsList.firstTeamPositionsList);
-    const secondTeamPositioned = this.initPositionTeam(secondTeam, teamPositionsList.secondTeamPositionsList);
-    this.allCharacters.firstTeamPositioned = firstTeamPositioned;
-    this.allCharacters.secondTeamPositioned = secondTeamPositioned;
-    this.gamePlay.redrawPositions(this.allCharactersList);
+    const nextLevel = this.getNextLevelType;
+    if (!nextLevel) {
+      this.finishGame();
+    } else {
+      this.gamePlay.drawUi(nextLevel);
+  
+      const firstTeam = generateTeam(this.firstTeamAllowedCharacters, 4, 1);
+      this.allCharacters.firstTeamPositioned.forEach(item => firstTeam.characters.add(item.character));
+      const secondTeam = generateTeam(this.secondTeamAllowedCharacters, 4, this.getNextEnemiesAmount);
+      const teamPositionsList = this.getPositions();
+      const firstTeamPositioned = this.initPositionTeam(firstTeam, teamPositionsList.firstTeamPositionsList);
+      const secondTeamPositioned = this.initPositionTeam(secondTeam, teamPositionsList.secondTeamPositionsList);
+      this.allCharacters.firstTeamPositioned = firstTeamPositioned;
+      this.allCharacters.secondTeamPositioned = secondTeamPositioned;
+      this.gamePlay.redrawPositions(this.allCharactersList);
+    }
   }
 
   levelUpCharacters(characterList) {
@@ -255,5 +275,24 @@ export default class GameController {
       posCharacter.character.defence = Math.max(posCharacter.character.defence, posCharacter.character.defence * ((80 + posCharacter.character.health) / 100));
       posCharacter.character.health = Math.min(100, posCharacter.character.health + 80);
     }
+  }
+
+  finishGame() {
+    this.gameState.running = false;
+    let cellIndex = 0;
+    for (let row = 0; row < this.gamePlay.boardSize; row++) {
+      for (let column = 0; column < this.gamePlay.boardSize; column++) {
+          this.gamePlay.deselectCell(cellIndex);
+          cellIndex++;
+      }
+    }
+    this.gameState.saveMaxPoints();
+  }
+
+  startNewGame() {
+    this.refreshLevels();
+    this.refreshEnemies();
+    this.gameState.refreshPoints();
+    this.init();
   }
 }
