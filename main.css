@@ -253,3 +253,10 @@ body {
   }
 }
 
+#score, #max-score {
+  margin-top: 20px;
+  text-align: center;
+  color: #FFFFFF;
+  font-size: larger;
+}
+
