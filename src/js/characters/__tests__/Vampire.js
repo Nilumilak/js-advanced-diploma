@@ -39,5 +39,5 @@ test('Attack', () => {
     const character1 = new Vampire(1);
     const character2 = new Vampire(1);
     character1.attackTarget(character2);
-    expect(character2.health).toBe(47.5);
+    expect(character2.health).toBe(48);
 });

@@ -16,8 +16,8 @@ test('createCharacterFromData', () => {
     const data = {
         character: {
             level: 3,
-            attack: 58.5,
-            defence: 58.5,
+            attack: 57,
+            defence: 57,
             health: 100,
             type: "bowman", 
         },

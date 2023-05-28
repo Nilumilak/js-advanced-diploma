@@ -29,15 +29,15 @@ export default class Character {
   }
 
   attackTarget(target) {
-    const damage = Math.max(this.attack - target.defence, this.attack * 0.1);
+    const damage = Math.floor(Math.max(this.attack - target.defence, this.attack * 0.1));
     target.health -= damage;
     return damage;
   }
 
   upgradeStats() {
-    this.attack = Math.max(this.attack, this.attack * ((80 + this.health) / 100));
-    this.defence = Math.max(this.defence, this.defence * ((80 + this.health) / 100));
-    this.health = Math.min(100, this.health + 80);
+    this.attack = Math.floor(Math.max(this.attack, this.attack * ((80 + this.health) / 100)));
+    this.defence = Math.floor(Math.max(this.defence, this.defence * ((80 + this.health) / 100)));
+    this.health = Math.floor(Math.min(100, this.health + 80));
   }
 
   levelUp() {
