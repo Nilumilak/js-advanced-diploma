@@ -323,6 +323,7 @@ export default class GameController {
     this.gameState.currentLevel = this.currentLevel;
     this.gameState.nextLevelsList = this.nextLevelsList;
     this.stateService.save(this.gameState);
+    GamePlay.showMessage('Game is saved');
   }
 
   loadGame() {
@@ -339,6 +340,9 @@ export default class GameController {
       this.allCharacters.firstTeamPositioned = this.gameState.firstTeamList.map(data => this.createCharacterFromData(data));
       this.allCharacters.secondTeamPositioned = this.gameState.secondTeamList.map(data => this.createCharacterFromData(data));
       this.gamePlay.redrawPositions(this.allCharactersList);
+      setTimeout(() => {
+        GamePlay.showMessage('Game is loaded');
+      }, 100);
     } catch {
       GamePlay.showError('Cannot find saved data');
     }
