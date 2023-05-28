@@ -253,6 +253,7 @@ export default class GameController {
           if (index > -1) {
             this.allCharacters.secondTeamPositioned.splice(this.allCharacters.secondTeamPositioned.indexOf(character), 1);
             this.gameState.getPoint();
+            this.gamePlay.updateScore(this.gameState);
           }
         }
       }
@@ -295,7 +296,6 @@ export default class GameController {
           cellIndex++;
       }
     }
-    this.gameState.saveMaxPoints();
   }
 
   startNewGame() {
@@ -315,6 +315,7 @@ export default class GameController {
     this.allCharacters.firstTeamPositioned = firstTeamPositioned;
     this.allCharacters.secondTeamPositioned = secondTeamPositioned;
     this.gamePlay.redrawPositions(this.allCharactersList);
+    this.gamePlay.updateScore(this.gameState);
   }
 
   saveGame() {
@@ -340,6 +341,7 @@ export default class GameController {
       this.allCharacters.firstTeamPositioned = this.gameState.firstTeamList.map(data => this.createCharacterFromData(data));
       this.allCharacters.secondTeamPositioned = this.gameState.secondTeamList.map(data => this.createCharacterFromData(data));
       this.gamePlay.redrawPositions(this.allCharactersList);
+      this.gamePlay.updateScore(this.gameState);
       setTimeout(() => {
         GamePlay.showMessage('Game is loaded');
       }, 100);

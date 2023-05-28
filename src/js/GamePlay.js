@@ -92,6 +92,15 @@ export default class GamePlay {
     }
   }
 
+  updateScore(gameState) {
+    const score = gameState.points;
+    const maxScore = gameState.maxPoints;
+    const scoreEl = document.querySelector('#score');
+    const maxScoreEl = document.querySelector('#max-score');
+    scoreEl.innerHTML = `Score: ${score}`;
+    maxScoreEl.innerHTML = `Max Score: ${maxScore}`;
+  }
+
   /**
    * Add listener to mouse enter for cell
    *

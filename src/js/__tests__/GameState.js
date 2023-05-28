@@ -24,11 +24,3 @@ test('refreshPoints', () => {
     gameState.refreshPoints();
     expect(gameState.points).toBe(0);
 });
-
-test('saveMaxPoints', () => {
-    const gameState = new GameState();
-
-    gameState.getPoint();
-    gameState.saveMaxPoints();
-    expect(gameState.maxPoints).toBe(1);
-});

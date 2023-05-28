@@ -25,17 +25,15 @@ export default class GameState {
 
   getPoint() {
     this.points++;
+    if (this.points > this.maxPoints) {
+      this.maxPoints = this.points;
+    }
   }
 
   refreshPoints() {
     this.points = 0;
   }
 
-  saveMaxPoints() {
-    this.maxPoints = this.points;
-    this.points = 0;
-  }
-  
   static from(object) {
     const {
       turn,
