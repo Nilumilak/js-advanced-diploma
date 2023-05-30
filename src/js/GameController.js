@@ -332,14 +332,15 @@ export default class GameController {
     this.characterSelected = undefined;
     const nextLevel = this.getNextLevelType;
     this.gameState.turn = 'first';
+    this.gameState.currentLevelNumber++;
     if (!nextLevel) {
       this.finishGame();
     } else {
       this.gamePlay.drawUi(nextLevel);
   
-      const firstTeam = generateTeam(this.firstTeamAllowedCharacters, 4, 1);
+      const firstTeam = generateTeam(this.firstTeamAllowedCharacters, this.gameState.currentLevelNumber, 1);
       this.allCharacters.firstTeamPositioned.forEach(item => firstTeam.characters.add(item.character));
-      const secondTeam = generateTeam(this.secondTeamAllowedCharacters, 4, this.getNextEnemiesAmount);
+      const secondTeam = generateTeam(this.secondTeamAllowedCharacters, this.gameState.currentLevelNumber, this.getNextEnemiesAmount);
       const teamPositionsList = this.getPositions();
       const firstTeamPositioned = this.initPositionTeam(firstTeam, teamPositionsList.firstTeamPositionsList);
       const secondTeamPositioned = this.initPositionTeam(secondTeam, teamPositionsList.secondTeamPositionsList);
@@ -369,8 +370,8 @@ export default class GameController {
     this.gamePlay.drawUi(themes.prairie);
     this.#currentLevel = themes.prairie;
 
-    const firstTeam = generateTeam(this.firstTeamAllowedCharacters, 4, 2);
-    const secondTeam = generateTeam(this.secondTeamAllowedCharacters, 4, 2);
+    const firstTeam = generateTeam(this.firstTeamAllowedCharacters, this.gameState.currentLevelNumber, 2);
+    const secondTeam = generateTeam(this.secondTeamAllowedCharacters, this.gameState.currentLevelNumber, 2);
     const teamPositionsList = this.getPositions();
     const firstTeamPositioned = this.initPositionTeam(firstTeam, teamPositionsList.firstTeamPositionsList);
     const secondTeamPositioned = this.initPositionTeam(secondTeam, teamPositionsList.secondTeamPositionsList);
