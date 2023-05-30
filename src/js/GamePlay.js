@@ -1,9 +1,9 @@
-import { calcHealthLevel, calcTileType, createTileMap } from './utils';
+import { calcHealthLevel, calcTileType, createBoardMap } from './utils';
 
 export default class GamePlay {
   constructor() {
     this.boardSize = 8;
-    this.tileMap = createTileMap(this.boardSize);
+    [this.tileMap, this.rowsColumnsMap] = createBoardMap(this.boardSize);
     this.container = null;
     this.boardEl = null;
     this.cells = [];

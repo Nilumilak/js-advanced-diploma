@@ -1,6 +1,7 @@
 import {
-    calcTileType, 
-    createTileMap, 
+    calcTileType,
+    getCharRowColumn, 
+    createBoardMap, 
     getRange, 
     getCharIndexes,
 } from "../utils";
@@ -90,7 +91,14 @@ test.each([
 });
 
 test('Test createTileMap', () => {
-    expect(createTileMap(8)).toEqual(testTileMap);
+    expect(createBoardMap(8)[0]).toEqual(testTileMap);
+});
+
+test('Test getCharRowColumn', () => {
+    const character = new Undead(1);
+    const posCharacter = new PositionedCharacter(character, 12);
+    const rowsColumnsMap = createBoardMap(8)[1];
+    expect(getCharRowColumn(posCharacter, 8, rowsColumnsMap)).toEqual({ row: 1, column: 4 });
 });
 
 test('getRange moves', () => {

@@ -7,7 +7,7 @@ import Swordsman from "./characters/Swordsman";
 import Undead from "./characters/Undead";
 import Vampire from "./characters/Vampire";
 import { generateTeam } from "./generators";
-import { getRange, getCharIndexes } from "./utils";
+import { getRange, getCharIndexes, getCharRowColumn } from "./utils";
 import GamePlay from "./GamePlay";
 import cursors from "./cursors";
 import GameState from "./GameState";
@@ -235,9 +235,70 @@ export default class GameController {
         }
       }
     }
-    this.gameState.changeTurn();
+    if (this.gameState.turn == 'second') {
+      this.enemyMove();
+      this.gamePlay.redrawPositions(this.allCharactersList);
+      this.gameState.changeTurn();
+    }
   }
+  
+  enemyMove() {
+    const firstCharPosition = getCharRowColumn(this.allCharacters.firstTeamPositioned[0], this.gamePlay.boardSize, this.gamePlay.rowsColumnsMap);
+    const secondCharPosition = getCharRowColumn(this.allCharacters.secondTeamPositioned[0], this.gamePlay.boardSize, this.gamePlay.rowsColumnsMap);
+    const charMoveRange = getRange(this.allCharacters.secondTeamPositioned[0], 'maxMoves', this.gamePlay.boardSize);
+    const charIndexes = getCharIndexes(this.allCharactersList);
+    let checkPosition;
+    let newPosition;
 
+    const rowDifference = Math.abs(secondCharPosition.row - firstCharPosition.row);
+    if (secondCharPosition.row < firstCharPosition.row) {
+      for (let index = 1; index <= rowDifference; index++) {
+        checkPosition = this.allCharacters.secondTeamPositioned[0].position + (this.gamePlay.boardSize * index);
+        if (charMoveRange.includes(checkPosition)) {
+          if (!charIndexes.includes(checkPosition)) {
+            newPosition = checkPosition;
+          }
+        }
+      }
+    } else {
+      for (let index = 1; index <= rowDifference; index++) {
+        checkPosition = this.allCharacters.secondTeamPositioned[0].position - (this.gamePlay.boardSize * index);
+        if (charMoveRange.includes(checkPosition)) {
+          if (!charIndexes.includes(checkPosition)) {
+            newPosition = checkPosition;
+          }
+        }
+      }
+    }
+    if (newPosition) {
+      this.allCharacters.secondTeamPositioned[0].position = newPosition;
+    }
+
+    const columnDifference = Math.abs(secondCharPosition.column - firstCharPosition.column);
+    if (secondCharPosition.column < firstCharPosition.column) {
+      for (let index = 1; index <= columnDifference; index++) {
+        checkPosition = this.allCharacters.secondTeamPositioned[0].position + index;
+        if (charMoveRange.includes(checkPosition)) {
+          if (!charIndexes.includes(checkPosition)) {
+            newPosition = checkPosition;
+          }
+        }
+      }
+    } else {
+      for (let index = 1; index <= columnDifference; index++) {
+        checkPosition = this.allCharacters.secondTeamPositioned[0].position - index;
+        if (charMoveRange.includes(checkPosition)) {
+          if (!charIndexes.includes(checkPosition)) {
+            newPosition = checkPosition;
+          }
+        }
+      }
+    }
+    if (newPosition) {
+      this.allCharacters.secondTeamPositioned[0].position = newPosition;
+    }
+  }
+  
   deleteDeadCharacters() {
     for (const character of this.allCharactersList) {
       if (character.character.health <= 0) {
@@ -266,10 +327,11 @@ export default class GameController {
       this.startNextLevel();
     }
   }
-
+  
   startNextLevel() {
     this.characterSelected = undefined;
     const nextLevel = this.getNextLevelType;
+    this.gameState.turn = 'first';
     if (!nextLevel) {
       this.finishGame();
     } else {
@@ -329,8 +391,12 @@ export default class GameController {
 
   loadGame() {
     try {
+      const { maxPoints } = this.gameState;
       const savedData = this.stateService.load();
       this.gameState = GameState.from(savedData);
+      if (maxPoints > this.gameState.maxPoints) {
+        this.gameState.maxPoints = maxPoints;
+      }
   
       this.characterSelected = undefined;
       const nextLevel = this.gameState.currentLevel;

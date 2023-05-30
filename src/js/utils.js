@@ -27,8 +27,9 @@ export function calcTileType(index, tileMap) {
   return tileMap[index];
 }
 
-export function createTileMap(boardSize) {
+export function createBoardMap(boardSize) {
   const tileMap = {};
+  const rowsColumnsMap = {};
   let index = 0;
   for (let row = 0; row < boardSize; row++) {
     for (let column = 0; column < boardSize; column++) {
@@ -51,10 +52,34 @@ export function createTileMap(boardSize) {
       } else {
         tileMap[index] = 'center';
       }
+      if (rowsColumnsMap[`row${row}`] == undefined) {
+        rowsColumnsMap[`row${row}`] = [index];
+      } else {
+        rowsColumnsMap[`row${row}`].push(index);
+      }
+      if (rowsColumnsMap[`column${column}`] == undefined) {
+        rowsColumnsMap[`column${column}`] = [index];
+      } else {
+        rowsColumnsMap[`column${column}`].push(index);
+      }
+      
       index++;
     }
   }
-  return tileMap;
+  return [tileMap, rowsColumnsMap];
+}
+
+export function getCharRowColumn(character, boardSize, rowsColumnsMap) {
+  const rowColumn = {};
+  for (let index = 0; index < boardSize; index++) {
+    if (rowsColumnsMap[`row${index}`].includes(character.position)) {
+      rowColumn.row = index;
+    }
+    if (rowsColumnsMap[`column${index}`].includes(character.position)) {
+      rowColumn.column = index;
+    }
+  }
+  return rowColumn;
 }
 
 export function calcHealthLevel(health) {
