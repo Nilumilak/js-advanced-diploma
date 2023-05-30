@@ -321,6 +321,7 @@ export default class GameController {
     }
     if (!this.allCharacters.firstTeamPositioned.length) {
       this.finishGame();
+      GamePlay.showMessage('You Lost!');
     }
     if (!this.allCharacters.secondTeamPositioned.length) {
       this.allCharacters.firstTeamPositioned.forEach((character) => character.character.levelUp());
@@ -335,6 +336,7 @@ export default class GameController {
     this.gameState.currentLevelNumber++;
     if (!nextLevel) {
       this.finishGame();
+      GamePlay.showMessage('You Won!');
     } else {
       this.gamePlay.drawUi(nextLevel);
   
